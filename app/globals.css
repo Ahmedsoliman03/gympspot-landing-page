@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-surface: var(--surface);
+  --font-sans: var(--font-family);
+}
+
+:root {
+  --font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+[lang="ar"] {
+  --font-family: var(--font-almarai), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Design tokens — identical to gym-web so the landing page and the app share
+   one visual language. Dark is the only theme. */
+:root {
+  --background: #0B0F1A;
+  --foreground: #F9FAFB;
+  --primary: #22C55E;
+  --primary-foreground: #000;
+  --surface: #161B2B;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0B0F1A;
+  --foreground: #F9FAFB;
+  --primary: #22C55E;
+  --primary-foreground: #000;
+  --surface: #161B2B;
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+  }
+
+  @media (max-width: 768px) {
+    html {
+      font-size: 14px;
+    }
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+@layer utilities {
+  /* Premium thin scrollbar — matches gym-web. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(34, 197, 94, 0.3) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(34, 197, 94, 0.2);
+    border-radius: 20px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background 0.3s ease;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(34, 197, 94, 0.5);
+    background-clip: content-box;
+  }
+
+  /* Reusable text gradient for headline highlights. A wider gradient + a
+     continuously panning background-position gives an always-on "shimmer"
+     that draws the eye to the highlighted words. Animates background-position
+     only, so it stays cheap. */
+  .text-gradient-primary {
+    background-image: linear-gradient(
+      110deg,
+      #22C55E 0%,
+      #4ade80 25%,
+      #bbf7d0 50%,
+      #4ade80 75%,
+      #22C55E 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: text-shimmer 6s linear infinite;
+  }
+
+  /* Soft pulsing dot — used on section labels so the foreground feels alive. */
+  .pulse-dot {
+    animation: pulse-dot 2.4s ease-in-out infinite;
+  }
+
+  /* Animated aurora glow used behind hero / CTA. Pure transform+opacity, so it
+     stays on the GPU compositor and never triggers layout. */
+  .glow-blob {
+    will-change: transform, opacity;
+  }
+}
+
+/* Slow ambient drift for background glows. Honors reduced-motion below. */
+@keyframes glow-drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(0, -24px, 0) scale(1.08);
+    opacity: 0.8;
+  }
+}
+
+.animate-glow-drift {
+  animation: glow-drift 14s ease-in-out infinite;
+}
+
+.animate-glow-drift-slow {
+  animation: glow-drift 20s ease-in-out infinite;
+}
+
+/* Panning shimmer for gradient text highlights. */
+@keyframes text-shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Pulsing accent dot with an expanding ring halo. */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55);
+  }
+  50% {
+    transform: scale(1.35);
+    box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-glow-drift,
+  .animate-glow-drift-slow,
+  .text-gradient-primary,
+  .pulse-dot {
+    animation: none;
+  }
+}

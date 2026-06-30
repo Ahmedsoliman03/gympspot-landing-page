@@ -1,0 +1,111 @@
+{
+  "Meta": {
+    "title": "GymSpot — The Fitness Marketplace",
+    "description": "GymSpot connects gyms, elite coaches, and clients in one platform. Grow your gym, build your coaching career, or find your perfect training fit."
+  },
+  "Nav": {
+    "gyms": "Gyms",
+    "coaches": "Coaches",
+    "clients": "Clients",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "Hero": {
+    "badge": "The All-In-One Fitness Marketplace",
+    "title": "Where Gyms, Coaches & Clients",
+    "titleHighlight": "Connect & Grow",
+    "subtitle": "GymSpot is the marketplace that brings the whole fitness world together. List your gym, grow your coaching career, or find the right place and people to reach your goals — all in one platform.",
+    "primaryCta": "Enter the Platform",
+    "secondaryCta": "Explore Gyms",
+    "stats": {
+      "gyms": "Partner Gyms",
+      "coaches": "Verified Coaches",
+      "clients": "Active Members"
+    }
+  },
+  "Gyms": {
+    "label": "For Gyms",
+    "title": "Fill Your Floor, Run It Smarter",
+    "description": "Put your gym in front of thousands of motivated members searching for their next home. Manage memberships, showcase your space, and hire vetted coaches — all from one dashboard.",
+    "features": {
+      "visibility": {
+        "title": "Get Discovered",
+        "desc": "Reach members actively searching for a gym in your area with a rich, searchable profile."
+      },
+      "memberships": {
+        "title": "Sell Memberships",
+        "desc": "Publish flexible membership plans and let clients subscribe directly through GymSpot."
+      },
+      "hiring": {
+        "title": "Hire Top Coaches",
+        "desc": "Post jobs and connect with verified coaches ready to grow your community."
+      },
+      "insights": {
+        "title": "Track Performance",
+        "desc": "Understand your members and growth with clear, real-time insights."
+      }
+    },
+    "videoCaption": "See how gyms grow with GymSpot",
+    "cta": "Go to Gyms"
+  },
+  "Coaches": {
+    "label": "For Coaches",
+    "title": "Build the Coaching Career You Deserve",
+    "description": "Showcase your certifications, transformations, and training style. Get discovered by clients and gyms, land jobs, and manage your roster — all in one professional profile.",
+    "features": {
+      "profile": {
+        "title": "A Profile That Sells",
+        "desc": "Show off your specialties, certifications, and client transformations in one place."
+      },
+      "jobs": {
+        "title": "Find Jobs Fast",
+        "desc": "Browse and apply to coaching opportunities from gyms that fit your style."
+      },
+      "clients": {
+        "title": "Grow Your Roster",
+        "desc": "Connect with motivated clients looking for exactly what you offer."
+      },
+      "tools": {
+        "title": "Tools To Deliver",
+        "desc": "Chat, schedule, and manage clients without juggling a dozen apps."
+      }
+    },
+    "videoCaption": "Meet coaches thriving on GymSpot",
+    "cta": "Go to Coaches"
+  },
+  "Clients": {
+    "label": "For Clients",
+    "title": "Find Your Gym. Find Your Coach. Crush Your Goals.",
+    "description": "Discover gyms near you, compare memberships, and connect with the coach who gets your goals. GymSpot makes starting — and sticking with — your fitness journey effortless.",
+    "features": {
+      "discover": {
+        "title": "Discover & Compare",
+        "desc": "Browse gyms and coaches with real photos, plans, and reviews you can trust."
+      },
+      "match": {
+        "title": "Find Your Match",
+        "desc": "Filter by goals, location, and style to find the coach and gym that fit you."
+      },
+      "connect": {
+        "title": "Connect Instantly",
+        "desc": "Message gyms and coaches directly and start training without the back-and-forth."
+      }
+    },
+    "videoCaption": "See how members find their fit on GymSpot",
+    "cta": "Find Your Fit"
+  },
+  "Cta": {
+    "title": "Ready to Join the GymSpot Movement?",
+    "subtitle": "Whether you run a gym, coach clients, or are starting your own journey — your spot is waiting.",
+    "button": "Get Started Free"
+  },
+  "Footer": {
+    "tagline": "The marketplace where the fitness world connects.",
+    "product": "Platform",
+    "gyms": "For Gyms",
+    "coaches": "For Coaches",
+    "clients": "For Clients",
+    "openApp": "Open the App",
+    "rights": "All rights reserved."
+  }
+}
