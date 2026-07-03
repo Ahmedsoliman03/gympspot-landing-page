@@ -7,6 +7,7 @@ import { Almarai } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { MotionProvider } from "@/components/motion/motion-provider";
+import { CustomCursor } from "@/components/motion/custom-cursor";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import "../globals.css";
@@ -103,6 +104,7 @@ export default async function LocaleLayout({
             disableTransitionOnChange
           >
             <MotionProvider>
+              <CustomCursor />
               <Navbar />
               <main>{children}</main>
               <Footer />

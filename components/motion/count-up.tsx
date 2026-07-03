@@ -1,9 +1,14 @@
 "use client";
 
-import { memo, useEffect, useRef } from "react";
-import { animate, useInView, useReducedMotion } from "framer-motion";
+import { memo, useRef } from "react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 interface CountUpProps {
   /** Target number to count to. */
@@ -22,16 +27,8 @@ interface CountUpProps {
 const defaultFormat = (v: number) => Math.round(v).toLocaleString("en-US");
 
 /**
- * Counts from 0 → `to` the first time it scrolls into view.
- *
- * PERFORMANCE: instead of `setState` on every animation frame (which would
- * re-render the React subtree ~60×/s), we animate a plain number and write the
- * formatted string straight onto the DOM node's `textContent`. React renders
- * once; Framer Motion drives the rest off-thread of the reconciler.
- *
- * Honors reduced-motion (snaps straight to the final value) and exposes the
- * final value via `aria-label` so screen readers announce it once, not on
- * every tick.
+ * Counts from 0 → `to` the first time it scrolls into view using GSAP.
+ * Writes the text directly onto the DOM node's `textContent` for performance.
  */
 const CountUpBase = ({
   to,
@@ -42,28 +39,34 @@ const CountUpBase = ({
   className,
 }: CountUpProps) => {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.6 });
-  const reduce = useReducedMotion();
   const finalText = `${prefix}${format(to)}${suffix}`;
 
-  useEffect(() => {
+  useGSAP(() => {
     const node = ref.current;
-    if (!node || !inView) return;
+    if (!node) return;
 
-    if (reduce) {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
       node.textContent = finalText;
       return;
     }
 
-    const controls = animate(0, to, {
+    const obj = { value: 0 };
+    gsap.to(obj, {
+      value: to,
       duration,
       ease: EASE_OUT,
-      onUpdate: (v) => {
-        node.textContent = `${prefix}${format(v)}${suffix}`;
+      scrollTrigger: {
+        trigger: node,
+        start: "top 85%",
+        toggleActions: "play none none none",
+        once: true,
+      },
+      onUpdate: () => {
+        node.textContent = `${prefix}${format(obj.value)}${suffix}`;
       },
     });
-    return () => controls.stop();
-  }, [inView, reduce, to, duration, prefix, suffix, format, finalText]);
+  }, { scope: ref, dependencies: [to, duration, prefix, suffix, format, finalText] });
 
   return (
     <span ref={ref} className={cn(className)} aria-label={finalText}>

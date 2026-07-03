@@ -1,48 +1,76 @@
 "use client";
 
-import { memo } from "react";
-import { m, type Variants } from "framer-motion";
-import { fadeUp, VIEWPORT } from "@/lib/motion";
+import { memo, useRef } from "react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 interface RevealProps {
   children: React.ReactNode;
   className?: string;
-  /** Animation variants. Defaults to fadeUp. */
-  variants?: Variants;
-  /** Delay (s) before the animation starts — handy for manual sequencing. */
+  /** Animation variants with hidden and visible states. */
+  variants?: {
+    hidden: Record<string, any>;
+    visible: Record<string, any>;
+  };
+  /** Delay in seconds before animation triggers. */
   delay?: number;
-  /** Render a different element (e.g. "section", "li"). Defaults to div. */
+  /** Render element tag. Defaults to div. */
   as?: "div" | "section" | "li" | "span" | "ul" | "h2" | "p";
 }
 
 /**
- * Reveal-on-scroll wrapper. Plays its variant once when scrolled into view
- * (`VIEWPORT.once`), so it never re-runs on subsequent scrolls — no wasted work.
- *
- * Memoized with React.memo: since the motion variants are stable module-level
- * objects, identical props mean React skips re-rendering this subtree, which
- * matters when a page has dozens of revealed elements.
+ * Reveal-on-scroll wrapper using GSAP ScrollTrigger.
+ * Plays its entrance animation once when scrolled into view.
  */
 const RevealBase = ({
   children,
   className,
   variants = fadeUp,
-  delay,
+  delay = 0,
   as = "div",
 }: RevealProps) => {
-  const MotionTag = m[as];
+  const containerRef = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      gsap.set(el, { opacity: 1, y: 0, scale: 1, x: 0, rotate: 0 });
+      return;
+    }
+
+    const { hidden, visible } = variants;
+
+    // Set initial hidden properties
+    gsap.set(el, hidden);
+
+    // Animates when visible in viewport
+    gsap.to(el, {
+      ...visible,
+      delay,
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        toggleActions: "play none none none",
+        once: true,
+      },
+    });
+  }, { scope: containerRef, dependencies: [variants, delay] });
+
+  const Tag = as;
+
   return (
-    <MotionTag
-      className={cn(className)}
-      variants={variants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={VIEWPORT}
-      transition={delay ? { delay } : undefined}
-    >
+    <Tag ref={containerRef as any} className={cn(className)}>
       {children}
-    </MotionTag>
+    </Tag>
   );
 };
 

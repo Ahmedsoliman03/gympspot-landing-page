@@ -1,23 +1,17 @@
 "use client";
 
 import { memo, useRef, type ReactNode } from "react";
-import {
-  m,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
-import { drawArc, VIEWPORT } from "@/lib/motion";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 /* -------------------------------------------------------------------------- */
 /*  Equipment silhouettes                                                     */
-/*                                                                            */
-/*  All shapes are stroke-only and use `currentColor`, so a parent's text     */
-/*  color + opacity (e.g. `text-primary/[0.07]`) controls how they read. They */
-/*  carry no fill, which keeps them feeling like light, premium line-art      */
-/*  rather than heavy blocks. `viewBox` is square so sizing is just w/h.      */
-/* -------------------------------------------------------------------------- */
+/*                               -------------------------------------------- */
 
 type ShapeProps = { className?: string };
 
@@ -114,11 +108,11 @@ interface FloatingShapeProps {
   className?: string;
   /** Vertical travel (px) across the scroll range — the parallax depth. */
   parallax?: number;
-  /** Ambient bob amplitude (px). Ignored when `spin` is set. */
+  /** Ambient bob amplitude (px). */
   float?: number;
-  /** Ambient rotation sway (deg). Ignored when `spin` is set. */
+  /** Ambient rotation sway (deg). */
   sway?: number;
-  /** If true, the shape rotates continuously (great for weight plates). */
+  /** If true, the shape rotates continuously. */
   spin?: boolean;
   /** Seconds for one ambient cycle. */
   duration?: number;
@@ -127,14 +121,9 @@ interface FloatingShapeProps {
 }
 
 /**
- * Wraps a decorative shape with two independent transforms so they never fight:
- *   • the OUTER element parallax-scrolls (driven by the element's own viewport
- *     progress via `useScroll({ target })`), and
- *   • the INNER element runs a looping ambient float/spin.
- *
- * Both are pure transforms (GPU-composited). When the user prefers reduced
- * motion we drop the parallax MotionValue to a constant and skip the loop, so
- * the shape is shown but completely still.
+ * Wraps a decorative shape with two independent transforms:
+ *   • outer element parallax-scrolls via GSAP ScrollTrigger (scrubbed)
+ *   • inner element runs a looping ambient float or continuous spin via GSAP
  */
 const FloatingShapeBase = ({
   children,
@@ -146,47 +135,71 @@ const FloatingShapeBase = ({
   duration = 9,
   delay = 0,
 }: FloatingShapeProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const outerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  // Map the element's pass-through-viewport progress to a vertical drift.
-  const drift = useTransform(scrollYProgress, [0, 1], [parallax, -parallax]);
+  useGSAP(() => {
+    const outer = outerRef.current;
+    const inner = innerRef.current;
+    if (!outer || !inner) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      return;
+    }
+
+    // 1. Parallax scroll effect on the outer container
+    gsap.fromTo(
+      outer,
+      { y: parallax },
+      {
+        y: -parallax,
+        ease: "none",
+        scrollTrigger: {
+          trigger: outer,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      }
+    );
+
+    // 2. Ambient looping animation on the inner container
+    if (spin) {
+      gsap.to(inner, {
+        rotate: 360,
+        duration: duration * 3,
+        repeat: -1,
+        ease: "none",
+      });
+    } else {
+      // Gentle float + rotation sway
+      gsap.fromTo(
+        inner,
+        { y: 0, rotate: -sway },
+        {
+          y: -float,
+          rotate: sway,
+          duration: duration / 2,
+          repeat: -1,
+          yoyo: true,
+          ease: "power1.inOut",
+          delay,
+        }
+      );
+    }
+  }, { scope: outerRef, dependencies: [parallax, float, sway, spin, duration, delay] });
 
   return (
-    <m.div
-      ref={ref}
+    <div
+      ref={outerRef}
       aria-hidden
-      style={{ y: reduce ? 0 : drift }}
       className={cn("pointer-events-none absolute -z-10", className)}
     >
-      <m.div
-        animate={
-          reduce
-            ? undefined
-            : spin
-              ? { rotate: 360 }
-              : { y: [0, -float, 0], rotate: [-sway, sway, -sway] }
-        }
-        transition={
-          reduce
-            ? undefined
-            : spin
-              ? { duration: duration * 3, repeat: Infinity, ease: "linear" }
-              : {
-                  duration,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay,
-                }
-        }
-      >
+      <div ref={innerRef}>
         {children}
-      </m.div>
-    </m.div>
+      </div>
+    </div>
   );
 };
 
@@ -198,7 +211,7 @@ export const FloatingShape = memo(FloatingShapeBase);
 
 interface KineticArcProps {
   className?: string;
-  /** Custom SVG path. Defaults to a swept momentum arc. */
+  /** Custom SVG path. */
   d?: string;
   /** viewBox; match it to your `d`. */
   viewBox?: string;
@@ -209,34 +222,68 @@ interface KineticArcProps {
 const DEFAULT_ARC = "M4 96C40 96 56 8 116 8";
 
 /**
- * A single sweeping stroke that "draws" via `pathLength` the first time it
- * scrolls into view — reads as a line of motion / momentum. Color + opacity
- * come from the parent's text color (e.g. `text-primary/30`).
+ * A single sweeping stroke that "draws" itself the first time it scrolls into view
+ * using standard SVG stroke-dash properties driven by GSAP and ScrollTrigger.
  */
 const KineticArcBase = ({
   className,
   d = DEFAULT_ARC,
   viewBox = "0 0 120 100",
   delay = 0,
-}: KineticArcProps) => (
-  <svg
-    aria-hidden
-    viewBox={viewBox}
-    fill="none"
-    className={cn("pointer-events-none absolute -z-10", className)}
-  >
-    <m.path
-      d={d}
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      variants={drawArc}
-      initial="hidden"
-      whileInView="visible"
-      viewport={VIEWPORT}
-      transition={delay ? { delay } : undefined}
-    />
-  </svg>
-);
+}: KineticArcProps) => {
+  const pathRef = useRef<SVGPathElement>(null);
+
+  useGSAP(() => {
+    const path = pathRef.current;
+    if (!path) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      gsap.set(path, { opacity: 1, strokeDashoffset: 0 });
+      return;
+    }
+
+    const length = path.getTotalLength();
+
+    // Initialize SVG dash properties
+    gsap.set(path, {
+      strokeDasharray: length,
+      strokeDashoffset: length,
+      opacity: 0,
+    });
+
+    // Draw animation when entering viewport
+    gsap.to(path, {
+      strokeDashoffset: 0,
+      opacity: 1,
+      duration: 1.4,
+      ease: "power2.out",
+      delay,
+      scrollTrigger: {
+        trigger: path,
+        start: "top 85%",
+        toggleActions: "play none none none",
+        once: true,
+      },
+    });
+  }, { dependencies: [d, delay] });
+
+  return (
+    <svg
+      aria-hidden
+      viewBox={viewBox}
+      fill="none"
+      className={cn("pointer-events-none absolute -z-10", className)}
+    >
+      <path
+        ref={pathRef}
+        d={d}
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+};
 
 export const KineticArc = memo(KineticArcBase);

@@ -1,23 +1,18 @@
 "use client";
 
-import { LazyMotion, domAnimation, MotionConfig } from "framer-motion";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /**
- * Wraps the app in LazyMotion so only the `domAnimation` feature bundle is
- * shipped (instead of the full Framer Motion runtime) — a smaller JS payload
- * and faster hydration. Throughout the app we therefore use the lightweight
- * `m.*` components (from "framer-motion") rather than `motion.*`.
- *
- * MotionConfig with `reducedMotion="user"` makes every animation automatically
- * respect the OS "reduce motion" setting, so we get accessibility for free.
+ * Registers GSAP plugins globally on client-side mount, replacing Framer Motion wrappers.
  */
 export function MotionProvider({ children }: { children: ReactNode }) {
-  return (
-    <MotionConfig reducedMotion="user">
-      <LazyMotion features={domAnimation} strict>
-        {children}
-      </LazyMotion>
-    </MotionConfig>
-  );
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+  }, []);
+
+  return <>{children}</>;
 }

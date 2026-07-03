@@ -1,25 +1,25 @@
 "use client";
 
-import { m } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { appUrl } from "@/lib/utils";
-import { fadeUp, staggerContainer, staggerItem, VIEWPORT } from "@/lib/motion";
+import { fadeUp } from "@/lib/motion";
 import { FloatingShape, PlateShape } from "@/components/motion/gym-shapes";
+import { Reveal } from "@/components/motion/reveal";
+import { SplitText } from "@/components/motion/split-text";
+import { Magnetic } from "@/components/motion/magnetic";
 
 export function CtaSection() {
   const t = useTranslations("Cta");
   const locale = useLocale();
 
   return (
-    <section className="px-4 pb-28 pt-8 sm:px-6">
-      <m.div
+    <section className="px-4 pb-14 pt-4 sm:px-6">
+      <Reveal
         variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={VIEWPORT}
-        className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-primary/20 bg-surface px-6 py-16 text-center sm:px-12 sm:py-20"
+        className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-primary/20 bg-surface px-6 py-16 text-center sm:px-12 sm:py-20 cursor-none"
+        data-cursor="join"
       >
         {/* Glow accents */}
         <div
@@ -48,32 +48,37 @@ export function CtaSection() {
           <PlateShape className="h-full w-full" />
         </FloatingShape>
 
-        <m.div
-          variants={staggerContainer}
+        <div
           className="relative z-10 mx-auto flex max-w-2xl flex-col items-center"
         >
-          <m.h2
-            variants={staggerItem}
-            className="text-3xl font-black leading-tight sm:text-5xl"
-          >
-            {t("title")}
-          </m.h2>
-          <m.p
-            variants={staggerItem}
+          <SplitText
+            as="h2"
+            text={t("title")}
+            className="text-3xl font-black leading-tight sm:text-5xl text-foreground"
+            delay={0.05}
+          />
+          <SplitText
+            as="p"
+            text={t("subtitle")}
             className="mt-5 text-base leading-relaxed text-foreground/60 sm:text-lg"
+            delay={0.1}
+          />
+          <Reveal
+            variants={fadeUp}
+            delay={0.2}
+            className="mt-9"
           >
-            {t("subtitle")}
-          </m.p>
-          <m.div variants={staggerItem} className="mt-9">
-            <a href={appUrl("/", locale)}>
-              <Button variant="primary" size="lg">
-                {t("button")}
-                <ArrowRight className="rtl:rotate-180" />
-              </Button>
-            </a>
-          </m.div>
-        </m.div>
-      </m.div>
+            <Magnetic>
+              <a href={appUrl("/", locale)}>
+                <Button variant="primary" size="lg">
+                  {t("button")}
+                  <ArrowRight className="rtl:rotate-180" />
+                </Button>
+              </a>
+            </Magnetic>
+          </Reveal>
+        </div>
+      </Reveal>
     </section>
   );
 }

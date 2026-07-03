@@ -1,6 +1,9 @@
 "use client";
 
-import { m } from "framer-motion";
+import { useRef } from "react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRight,
   BarChart3,
@@ -15,12 +18,17 @@ import { VideoFrame } from "@/components/video-frame";
 import { SectionLabel } from "./section-label";
 import { FeatureCard } from "./feature-card";
 import { appUrl } from "@/lib/utils";
-import { fadeUp, riseIn, staggerContainer, VIEWPORT } from "@/lib/motion";
+import { fadeUp } from "@/lib/motion";
 import {
   FloatingShape,
   KineticArc,
   PlateShape,
 } from "@/components/motion/gym-shapes";
+import { SplitText } from "@/components/motion/split-text";
+import { Magnetic } from "@/components/motion/magnetic";
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 const FEATURES = [
   { key: "visibility", icon: Search },
@@ -33,10 +41,74 @@ export function GymsSection() {
   const t = useTranslations("Gyms");
   const locale = useLocale();
 
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const zoomTrackRef = useRef<HTMLDivElement>(null);
+  const videoWrapperRef = useRef<HTMLDivElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const zoomTrack = zoomTrackRef.current;
+    const videoWrapper = videoWrapperRef.current;
+    if (!zoomTrack || !videoWrapper) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
+    // Viewport Pinned Video Zoom-Out effect
+    gsap.fromTo(
+      videoWrapper,
+      { scale: 1.35, borderRadius: "0px" },
+      {
+        scale: 1.0,
+        borderRadius: "24px",
+        ease: "none",
+        scrollTrigger: {
+          trigger: zoomTrack,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+          pin: true,
+          pinSpacing: true,
+        },
+      }
+    );
+  }, { scope: sectionRef });
+
+  useGSAP(() => {
+    const el = featuresRef.current;
+    if (!el) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
+    const cards = el.querySelectorAll(".reveal-item");
+    if (!cards.length) return;
+
+    // Set initial states
+    gsap.set(cards, { opacity: 0, y: 20 });
+
+    // Animate and stagger features on scroll
+    gsap.to(cards, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: "power2.out",
+      stagger: 0.1,
+      clearProps: "transform",
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        toggleActions: "play none none none",
+        once: true,
+      },
+    });
+  }, { scope: featuresRef });
+
   return (
     <section
+      ref={sectionRef}
       id="gyms"
-      className="relative scroll-mt-24 overflow-hidden px-4 py-28 sm:px-6 md:py-44"
+      className="relative scroll-mt-24 overflow-hidden py-14 px-4 sm:px-6 md:py-24"
     >
       {/* Sparse gym motif */}
       <FloatingShape
@@ -48,55 +120,67 @@ export function GymsSection() {
       </FloatingShape>
       <KineticArc className="bottom-12 start-[4%] z-0 hidden w-24 text-primary/15 lg:block" />
 
-      <div className="relative z-10 mx-auto max-w-3xl text-center">
+      {/* 1. Header (Scrolls normally) */}
+      <div className="relative z-10 mx-auto max-w-3xl text-center mb-10">
         <Reveal className="flex justify-center">
           <SectionLabel index="01">{t("label")}</SectionLabel>
         </Reveal>
-        <Reveal variants={riseIn} delay={0.05}>
-          <h2 className="mx-auto mt-7 max-w-3xl text-4xl font-black leading-[1.04] tracking-tight sm:text-5xl md:text-6xl">
-            {t("title")}
-          </h2>
-        </Reveal>
-        <Reveal variants={fadeUp} delay={0.1}>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-foreground/60">
-            {t("description")}
-          </p>
-        </Reveal>
+        <SplitText
+          as="h2"
+          text={t("title")}
+          className="mx-auto mt-7 max-w-3xl text-4xl font-black leading-[1.04] tracking-tight sm:text-5xl md:text-6xl text-foreground"
+          delay={0.05}
+        />
+        <SplitText
+          as="p"
+          text={t("description")}
+          className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-foreground/60"
+          delay={0.1}
+        />
       </div>
 
-      <div className="relative z-10 mx-auto mt-14 max-w-5xl">
-        <VideoFrame src="/videos/gyms.mp4" caption={t("videoCaption")} />
+      {/* 2. Zoom Track (Pins viewport and zooms out video) */}
+      <div ref={zoomTrackRef} className="relative z-10 w-full h-[120vh] mb-10">
+        <div className="sticky top-0 left-0 flex h-screen w-full items-center justify-center overflow-hidden">
+          <div className="relative w-full max-w-5xl aspect-video overflow-hidden rounded-3xl">
+            <div ref={videoWrapperRef} className="w-full h-full origin-center overflow-hidden">
+              <VideoFrame src="/videos/gyms.mp4" caption={t("videoCaption")} className="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      <m.div
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={VIEWPORT}
-        className="relative z-10 mx-auto mt-16 grid max-w-3xl gap-x-10 gap-y-12 sm:grid-cols-2"
+      {/* 3. Features & CTA (Scrolls up naturally below video) */}
+      <div
+        ref={featuresRef}
+        className="relative z-10 mx-auto max-w-3xl flex flex-col items-center"
       >
-        {FEATURES.map(({ key, icon }) => (
-          <FeatureCard
-            key={key}
-            icon={icon}
-            title={t(`features.${key}.title`)}
-            desc={t(`features.${key}.desc`)}
-          />
-        ))}
-      </m.div>
+        <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2 w-full">
+          {FEATURES.map(({ key, icon }) => (
+            <FeatureCard
+              key={key}
+              icon={icon}
+              title={t(`features.${key}.title`)}
+              desc={t(`features.${key}.desc`)}
+            />
+          ))}
+        </div>
 
-      <Reveal
-        variants={fadeUp}
-        delay={0.1}
-        className="relative z-10 mt-12 flex justify-center"
-      >
-        <a href={appUrl("/gyms", locale)}>
-          <Button variant="primary" size="lg">
-            {t("cta")}
-            <ArrowRight className="rtl:rotate-180" />
-          </Button>
-        </a>
-      </Reveal>
+        <Reveal
+          variants={fadeUp}
+          delay={0.1}
+          className="mt-10 flex justify-center w-full"
+        >
+          <Magnetic>
+            <a href={appUrl("/gyms", locale)}>
+              <Button variant="primary" size="lg">
+                {t("cta")}
+                <ArrowRight className="rtl:rotate-180" />
+              </Button>
+            </a>
+          </Magnetic>
+        </Reveal>
+      </div>
     </section>
   );
 }
