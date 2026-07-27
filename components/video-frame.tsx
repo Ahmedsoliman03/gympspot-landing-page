@@ -114,10 +114,7 @@ const VideoFrameBase = ({ src, poster, caption, className }: VideoFrameProps) =>
               <Play className="relative ms-1 size-8 fill-current" />
             </span>
 
-            {/* Caption */}
-            <span className="absolute bottom-5 start-6 z-10 text-sm font-bold text-foreground/80">
-              {caption}
-            </span>
+          
           </button>
         )}
       </Reveal>

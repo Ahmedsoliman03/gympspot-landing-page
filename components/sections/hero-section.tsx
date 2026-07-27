@@ -154,10 +154,15 @@ export function HeroSection() {
         </div>
 
         <h1
-          className="hero-title mt-6 text-5xl font-black leading-[1.02] tracking-tight sm:text-6xl md:text-7xl"
+          className="hero-title mt-6 text-5xl font-black leading-[1.02] tracking-tight sm:text-6xl md:text-7xl text-center"
         >
           <SplitText text={t("title")} as="span" className="inline mr-3 rtl:ml-3 rtl:mr-0" />
-          <SplitText text={t("titleHighlight")} as="span" className="text-gradient-primary inline" delay={0.3} />
+          <SplitText
+            text={t("titleHighlight")}
+            as="span"
+            className="inline [&_.split-word-inner]:text-gradient-primary"
+            delay={0.3}
+          />
         </h1>
 
         <SplitText

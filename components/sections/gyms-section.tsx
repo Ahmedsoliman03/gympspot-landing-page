@@ -140,11 +140,11 @@ export function GymsSection() {
       </div>
 
       {/* 2. Zoom Track (Pins viewport and zooms out video) */}
-      <div ref={zoomTrackRef} className="relative z-10 w-full h-[120vh] mb-10">
-        <div className="sticky top-0 left-0 flex h-screen w-full items-center justify-center overflow-hidden">
+      <div ref={zoomTrackRef} className="relative z-10 w-full mb-10 h-full">
+        <div className="sticky top-0 left-0 flex  w-full items-center justify-center overflow-hidden">
           <div className="relative w-full max-w-5xl aspect-video overflow-hidden rounded-3xl">
             <div ref={videoWrapperRef} className="w-full h-full origin-center overflow-hidden">
-              <VideoFrame src="/videos/gyms.mp4" caption={t("videoCaption")} className="w-full h-full object-cover" />
+              <VideoFrame src="/videos/gyms.mp4"caption={t("videoCaption")} className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
