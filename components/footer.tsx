@@ -1,16 +1,13 @@
-import { useLocale, useTranslations } from "next-intl";
+import {  useTranslations } from "next-intl";
 import { BrandLogo } from "./brand-logo";
-import { appUrl } from "@/lib/utils";
 
 export function Footer() {
   const t = useTranslations("Footer");
-  const locale = useLocale();
 
   const links = [
     { label: t("gyms"), href: "#gyms", external: false },
     { label: t("coaches"), href: "#coaches", external: false },
     { label: t("clients"), href: "#clients", external: false },
-    { label: t("openApp"), href: appUrl("/", locale), external: true },
   ];
 
   return (
