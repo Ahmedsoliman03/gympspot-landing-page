@@ -11,11 +11,15 @@ export function cn(...inputs: ClassValue[]) {
  * Configured via NEXT_PUBLIC_APP_URL; defaults to the local dev server.
  */
 export const APP_URL = (
-  process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  process.env.NEXT_PUBLIC_APP_URL || "/platform"
 ).replace(/\/$/, "");
 
 /** Build an absolute URL into the GymSpot app, locale-aware. */
 export function appUrl(path = "", locale = "en") {
   const clean = path.startsWith("/") ? path : `/${path}`;
-  return `${APP_URL}/${locale}${clean === "/" ? "" : clean}`;
+  let base = APP_URL || "/platform";
+  if (!base.startsWith("http") && !base.startsWith("/")) {
+    base = `/${base}`;
+  }
+  return `${base}/${locale}${clean === "/" ? "" : clean}`;
 }
