@@ -90,7 +90,9 @@ export function CustomCursor() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!isVisible) return null;
+  // Don't render on touch devices (isTouchDevice check causes early return inside useGSAP)
+  // Use opacity instead of conditional render to avoid flash where cursor-none is active
+  // but the custom cursor hasn't mounted yet.
 
   const isPlayOrJoin = cursorType === "play" || cursorType === "join";
 
@@ -99,13 +101,15 @@ export function CustomCursor() {
       {/* Inner precise dot */}
       <div
         ref={dotRef}
-        className="pointer-events-none fixed left-0 top-0 z-[9999] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary mix-blend-difference"
+        className="pointer-events-none fixed left-0 top-0 z-[9999] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary mix-blend-difference transition-opacity duration-150"
+        style={{ opacity: isVisible ? 1 : 0 }}
       />
       {/* Outer lagging ring */}
       <div
         ref={cursorRef}
         className="pointer-events-none fixed left-0 top-0 z-[9998] flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-primary/30 text-[9px] font-black tracking-widest text-primary-foreground transition-all duration-300 ease-out"
         style={{
+          opacity: isVisible ? 1 : 0,
           width: isPlayOrJoin ? "70px" : cursorType === "hover" ? "36px" : "20px",
           height: isPlayOrJoin ? "70px" : cursorType === "hover" ? "36px" : "20px",
           backgroundColor: cursorType === "play" ? "var(--primary)" : cursorType === "join" ? "var(--primary)" : "transparent",
