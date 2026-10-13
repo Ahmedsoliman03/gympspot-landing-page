@@ -13,7 +13,6 @@ gsap.registerPlugin(ScrollTrigger);
 interface CountUpProps {
   to: number;
   suffix?: string;
-  /** Prepended before the number, e.g. "$". */
   prefix?: string;
   /** Seconds for the count animation. */
   duration?: number;
