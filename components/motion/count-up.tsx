@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 gsap.registerPlugin(ScrollTrigger);
 
 interface CountUpProps {
-  /** Target number to count to. */
   to: number;
   /** Appended after the number, e.g. "+" or "K+". */
   suffix?: string;
