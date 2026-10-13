@@ -59,12 +59,12 @@ jobs:
             echo "==> 1. Pulling latest landing image..."
             echo "=========================================="
             cd /home/gymspot/gymspot || cd ~/gymspot
-            docker compose pull landing
+            docker compose pull landing-page
 
             echo "=========================================="
             echo "==> 2. Restarting landing container..."
             echo "=========================================="
-            docker compose up -d --no-deps landing
+            docker compose up -d --no-deps landing-page
 
             echo "=========================================="
             echo "==> 3. Cleaning unused images..."
