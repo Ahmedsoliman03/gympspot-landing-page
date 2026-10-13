@@ -12,7 +12,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface CountUpProps {
   to: number;
-  /** Appended after the number, e.g. "+" or "K+". */
   suffix?: string;
   /** Prepended before the number, e.g. "$". */
   prefix?: string;
