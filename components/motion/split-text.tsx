@@ -28,17 +28,17 @@ export function SplitText({ text, className, as = "div", delay = 0 }: SplitTextP
     if (!el) return;
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) {
-      gsap.set(el.querySelectorAll(".split-word-inner"), { y: 0, opacity: 1 });
-      return;
-    }
+    if (prefersReducedMotion) return; // words are already visible by default
 
     const words = el.querySelectorAll(".split-word-inner");
     if (!words.length) return;
 
-    gsap.fromTo(
+    // Immediately hide words AFTER React renders them visible (prevents flash of
+    // empty content from SSR opacity-0 approach)
+    gsap.set(words, { y: "115%", opacity: 0 });
+
+    gsap.to(
       words,
-      { y: "115%", opacity: 0 },
       {
         y: "0%",
         opacity: 1,
@@ -66,7 +66,7 @@ export function SplitText({ text, className, as = "div", delay = 0 }: SplitTextP
           key={wordIndex}
           className="inline-block overflow-hidden py-[0.1em] mr-[0.25em] rtl:ml-[0.25em] rtl:mr-0 align-middle"
         >
-          <span className="split-word-inner inline-block translate-y-full opacity-0">
+          <span className="split-word-inner inline-block">
             {word}
           </span>
         </span>

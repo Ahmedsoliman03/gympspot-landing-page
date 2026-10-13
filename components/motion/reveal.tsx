@@ -42,14 +42,12 @@ const RevealBase = ({
     if (!el) return;
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) {
-      gsap.set(el, { opacity: 1, y: 0, scale: 1, x: 0, rotate: 0 });
-      return;
-    }
+    // On reduced motion, element is already visible — nothing to do
+    if (prefersReducedMotion) return;
 
     const { hidden, visible } = variants;
 
-    // Set initial hidden properties
+    // Hide AFTER React renders (prevents blank flash from SSR opacity:0)
     gsap.set(el, hidden);
 
     // Animates when visible in viewport

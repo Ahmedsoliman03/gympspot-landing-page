@@ -32,7 +32,8 @@ export function CustomCursor() {
     const dotYTo = gsap.quickTo(dot, "y", { duration: 0.1, ease: "power3" });
 
     const onMouseMove = (e: MouseEvent) => {
-      if (!isVisible) setIsVisible(true);
+      // Use functional updater to avoid stale closure without re-registering listeners
+      setIsVisible((prev) => { if (!prev) return true; return prev; });
 
       xTo(e.clientX);
       yTo(e.clientY);
@@ -85,7 +86,9 @@ export function CustomCursor() {
       document.removeEventListener("mouseenter", onMouseEnter);
       window.removeEventListener("mouseover", onMouseOver);
     };
-  }, [isVisible]);
+  // Empty deps: register event listeners once only on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!isVisible) return null;
 
