@@ -14,9 +14,7 @@ interface CountUpProps {
   to: number;
   suffix?: string;
   prefix?: string;
-  /** Seconds for the count animation. */
   duration?: number;
-  /** Formats the live number. Defaults to a thousands-separated integer. */
   format?: (value: number) => string;
   className?: string;
 }
