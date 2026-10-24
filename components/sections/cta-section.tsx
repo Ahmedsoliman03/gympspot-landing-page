@@ -18,8 +18,7 @@ export function CtaSection() {
     <section className="px-4 pb-14 pt-4 sm:px-6">
       <Reveal
         variants={fadeUp}
-        className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-primary/20 bg-surface px-6 py-16 text-center sm:px-12 sm:py-20 cursor-none"
-        data-cursor="join"
+        className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-primary/20 bg-surface px-6 py-16 text-center sm:px-12 sm:py-20"
       >
         {/* Glow accents */}
         <div

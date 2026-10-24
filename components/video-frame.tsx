@@ -87,9 +87,8 @@ const VideoFrameBase = ({ src, poster, caption, className }: VideoFrameProps) =>
           <button
             type="button"
             onClick={() => canPlay && setPlaying(true)}
-            className="absolute inset-0 flex items-center justify-center cursor-none"
+            className="absolute inset-0 flex items-center justify-center cursor-pointer"
             aria-label={caption}
-            data-cursor="play"
           >
             {/* Poster wrapper with parallax scroll effect */}
             <div className="parallax-media absolute inset-0 h-full w-full overflow-hidden">

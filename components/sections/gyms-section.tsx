@@ -108,7 +108,7 @@ export function GymsSection() {
     <section
       ref={sectionRef}
       id="gyms"
-      className="relative scroll-mt-24 overflow-hidden py-14 px-4 sm:px-6 md:py-24"
+      className="relative scroll-mt-24 overflow-hidden py-14 px-4 sm:px-6"
     >
       {/* Sparse gym motif */}
       <FloatingShape
@@ -144,7 +144,7 @@ export function GymsSection() {
         <div className="sticky top-0 left-0 flex  w-full items-center justify-center overflow-hidden">
           <div className="relative w-full max-w-5xl aspect-video overflow-hidden rounded-3xl">
             <div ref={videoWrapperRef} className="w-full h-full origin-center overflow-hidden">
-              <VideoFrame src="/videos/gyms.mp4"caption={t("videoCaption")} className="w-full h-full object-cover" />
+              <VideoFrame src="/videos/gyms.mp4" caption={t("videoCaption")} className="w-full h-full object-cover" />
             </div>
           </div>
         </div>

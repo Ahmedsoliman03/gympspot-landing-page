@@ -14,18 +14,18 @@ import {
   DumbbellShape,
   BarbellShape,
 } from "@/components/motion/gym-shapes";
-import { CountUp } from "@/components/motion/count-up";
+// import { CountUp } from "@/components/motion/count-up";
 import { SplitText } from "@/components/motion/split-text";
 import { Magnetic } from "@/components/motion/magnetic";
 
 /**
  * Stats counted up on scroll.
  */
-const STATS = [
-  { key: "gyms", to: 500, suffix: "+" },
-  { key: "coaches", to: 2000, suffix: "+" },
-  { key: "clients", to: 50, suffix: "K+" },
-] as const;
+// const STATS = [
+//   { key: "gyms", to: 500, suffix: "+" },
+//   { key: "coaches", to: 2000, suffix: "+" },
+//   { key: "clients", to: 50, suffix: "K+" },
+// ] as const;
 
 export function HeroSection() {
   const t = useTranslations("Hero");
@@ -50,7 +50,7 @@ export function HeroSection() {
     const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
     // 1. Badge entry
-    tl.fromTo(badge, 
+    tl.fromTo(badge,
       { opacity: 0, y: 20 },
       { opacity: 1, y: 0, duration: 0.6 }
     );
@@ -193,7 +193,7 @@ export function HeroSection() {
         </div>
 
         {/* Stats */}
-        <div
+        {/* <div
           className="hero-stats mt-16 grid w-full max-w-2xl grid-cols-3 gap-4 border-t border-white/10 pt-10"
         >
           {STATS.map(({ key, to, suffix }) => (
@@ -208,7 +208,7 @@ export function HeroSection() {
               </span>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </section>
   );

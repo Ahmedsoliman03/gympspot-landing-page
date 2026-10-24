@@ -77,7 +77,7 @@ export function CoachesSection() {
   return (
     <section
       id="coaches"
-      className="relative scroll-mt-24 overflow-hidden px-4 py-14 sm:px-6 md:py-24"
+      className="relative scroll-mt-24 overflow-hidden px-4 py-14 sm:px-6"
     >
       {/* subtle surface band to alternate rhythm between sections */}
       <div
